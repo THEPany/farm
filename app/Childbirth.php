@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use TCG\Voyager\Facades\Voyager;
 
@@ -10,17 +10,17 @@ class Childbirth extends Model
 {
     public function getChildbirthAtBrowseAttribute()
     {
-        return $this->childbirthAt($this->childbirth_at);
+        return $this->childbirthAt()->isoFormat('LLLL');
     }
 
     public function getChildbirthAtReadAttribute()
     {
-        return $this->childbirthAt($this->childbirth_at);
+        return $this->childbirthAt()->isoFormat('LLLL');
     }
 
-    public function childbirthAt($date)
+    public function childbirthAt()
     {
-        return Carbon::parse($date)->addDays(static::pregnancyDays())->isoFormat('LLLL');
+        return CarbonImmutable::parse($this->childbirth_at)->addDays(static::pregnancyDays());
     }
 
     public function vaccinations()
