@@ -33,18 +33,38 @@ class Childbirth extends Model
         return $this->belongsToMany(Food::class, 'childbirth_foods');
     }
 
-    public function scopeFirstStage($query)
+    public function hasNotBorn($query)
     {
         return $query->whereRaw('childbirth_at + interval '. static::pregnancyDays() .' day >= ?', [today()]);
     }
 
-    public function scopeSecondStage($query)
+    public function hasBorn($query)
     {
         return $query->whereRaw('childbirth_at + interval '. static::pregnancyDays() .' day < ?', [today()]);
+    }
+
+    public function separateFromMother($query)
+    {
+        return $query->whereRaw('childbirth_at + interval '. static::pregnancyDays()  + static::separateFromMotherDays().' day < ?', [today()]);
+    }
+
+    public function forSales($query)
+    {
+        return $query->whereRaw('childbirth_at + interval '. static::pregnancyDays() + static::separateFromMotherDays() + static::forSalesDays() .' day < ?', [today()]);
     }
 
     public static function pregnancyDays()
     {
         return (int) Voyager::setting('admin.pregnancy_days');
+    }
+
+    public static function separateFromMotherDays()
+    {
+        return (int) Voyager::setting('admin.separates_from_mother_days');
+    }
+
+    public static function forSalesDays()
+    {
+        return (int) Voyager::setting('admin.acts_for_sale');
     }
 }
